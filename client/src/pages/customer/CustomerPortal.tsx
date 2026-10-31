@@ -69,30 +69,30 @@ export const CustomerPortal: React.FC = () => {
             </div>
           ) : (
             subscriptions.map(sub => (
-              <div key={sub.id} className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
+              <div key={sub.id} className="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 p-5 shadow-sm space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="font-mono text-xs font-bold text-blue-600">{sub.subscriptionNumber}</span>
-                    <h3 className="text-base font-bold text-slate-900">{sub.plan.name}</h3>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-slate-50">{sub.plan.name}</h3>
                   </div>
                   <Badge status={sub.status} />
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                   <div>
                     <span className="text-slate-400 block text-[10px]">Next Billing Date</span>
-                    <strong className="text-slate-900">{new Date(sub.nextBillingDate).toLocaleDateString()}</strong>
+                    <strong className="text-slate-900 dark:text-slate-50">{new Date(sub.nextBillingDate).toLocaleDateString()}</strong>
                   </div>
                   <div>
                     <span className="text-slate-400 block text-[10px]">Renewal / Expiry</span>
-                    <strong className="text-slate-900">{new Date(sub.expiryDate).toLocaleDateString()}</strong>
+                    <strong className="text-slate-900 dark:text-slate-50">{new Date(sub.expiryDate).toLocaleDateString()}</strong>
                   </div>
                 </div>
                 <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
                   <div>
                     <span className="text-slate-400">Cycle Price: </span>
-                    <span className="font-black text-slate-900">₹{sub.totalAmount.toLocaleString('en-IN')}</span>
+                    <span className="font-black text-slate-900 dark:text-slate-50">₹{sub.totalAmount.toLocaleString('en-IN')}</span>
                   </div>
-                  <span className="text-[11px] font-semibold text-slate-500">Terms: {sub.paymentTerms}</span>
+                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Terms: {sub.paymentTerms}</span>
                 </div>
               </div>
             ))
@@ -105,8 +105,8 @@ export const CustomerPortal: React.FC = () => {
           <Receipt className="w-5 h-5 text-blue-600" />
           <span>My Invoices & Receipts</span>
         </h2>
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <table className="w-full text-left text-xs text-slate-600">
+        <div className="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm overflow-hidden">
+          <table className="w-full text-left text-xs text-slate-600 dark:text-slate-400">
             <thead className="bg-slate-50 text-[11px] font-bold text-slate-700 uppercase tracking-wider border-b border-slate-200">
               <tr>
                 <th className="px-6 py-3.5">Invoice #</th>
@@ -127,7 +127,7 @@ export const CustomerPortal: React.FC = () => {
                     <td className="px-6 py-3.5 font-mono font-bold text-blue-700">{inv.invoiceNumber}</td>
                     <td className="px-6 py-3.5">{new Date(inv.invoiceDate).toLocaleDateString()}</td>
                     <td className="px-6 py-3.5">{new Date(inv.dueDate).toLocaleDateString()}</td>
-                    <td className="px-6 py-3.5 font-bold text-slate-900">₹{inv.totalAmount.toLocaleString('en-IN')}</td>
+                    <td className="px-6 py-3.5 font-bold text-slate-900 dark:text-slate-50">₹{inv.totalAmount.toLocaleString('en-IN')}</td>
                     <td className="px-6 py-3.5 font-bold text-rose-600">₹{inv.outstandingBalance.toLocaleString('en-IN')}</td>
                     <td className="px-6 py-3.5"><Badge status={inv.status} /></td>
                     <td className="px-6 py-3.5 text-right">

@@ -26,7 +26,7 @@ export const Customers: React.FC = () => {
   return (
     <div className="p-8 space-y-8">
       <div>
-        <h1 className="text-2xl font-black text-slate-900 tracking-tight">Customer Directory</h1>
+        <h1 className="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tight">Customer Directory</h1>
         <p className="text-xs text-slate-500 mt-1">Manage SME and enterprise client profiles, subscription engagements, and billing history</p>
       </div>
 
@@ -38,10 +38,10 @@ export const Customers: React.FC = () => {
         ) : customers.map((c) => {
           const totalOutstanding = c.invoices?.reduce((acc: number, inv: any) => acc + (inv.outstandingBalance || 0), 0) || 0;
           return (
-            <div key={c.id} className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div key={c.id} className="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 p-6 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">{c.companyName || c.user.name}</h3>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-slate-50">{c.companyName || c.user.name}</h3>
                   {c.companyName && <p className="text-xs text-slate-400 mt-0.5">Contact: {c.user.name}</p>}
                 </div>
                 <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm">
@@ -49,7 +49,7 @@ export const Customers: React.FC = () => {
                 </div>
               </div>
 
-              <div className="mt-4 space-y-2 text-xs text-slate-600">
+              <div className="mt-4 space-y-2 text-xs text-slate-600 dark:text-slate-400">
                 <div className="flex items-center space-x-2">
                   <Mail className="w-3.5 h-3.5 text-slate-400" />
                   <span className="truncate">{c.user.email}</span>
@@ -76,7 +76,7 @@ export const Customers: React.FC = () => {
               <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
                 <div>
                   <span className="text-slate-400">Subscriptions: </span>
-                  <span className="font-bold text-slate-900">{c.subscriptions?.length || 0}</span>
+                  <span className="font-bold text-slate-900 dark:text-slate-50">{c.subscriptions?.length || 0}</span>
                 </div>
                 <div>
                   <span className="text-slate-400">Outstanding: </span>

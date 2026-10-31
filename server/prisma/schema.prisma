@@ -471,6 +471,11 @@ model RenewalNotification {
   stageDays      Int
   renewalDate    DateTime
   renewalAmount  Float
+  deliveryStatus String   @default("DELIVERED")
+  isRead         Boolean  @default(false)
+  readAt         DateTime?
+  actionLink     String?
+  emailRecipient String?
   createdAt      DateTime @default(now())
   @@unique([subscriptionId, renewalDate, stageDays])
   @@index([customerId, createdAt])
@@ -502,6 +507,7 @@ model SubscriptionChange {
 model RenewalSettings {
   id                String   @id @default("default")
   reminderIntervals Json     @default("[30,15,7,3,0]")
+  downgradeTiming   String   @default("IMMEDIATE")
   updatedAt         DateTime @updatedAt
 }
 

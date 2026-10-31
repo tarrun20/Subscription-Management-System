@@ -81,7 +81,7 @@ export const Subscriptions: React.FC = () => {
     <div className="p-8 space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Active Subscriptions</h1>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tight">Active Subscriptions</h1>
           <p className="text-xs text-slate-500 mt-1">
             State transitions: <code>Draft → Quotation → Confirmed → Active → Closed</code>
           </p>
@@ -96,7 +96,7 @@ export const Subscriptions: React.FC = () => {
               className={`px-3 py-1.5 rounded-lg transition-all ${
                 statusFilter === s
                   ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                  : 'text-slate-600 hover:text-slate-900 dark:text-slate-50'
               }`}
             >
               {s ? s.charAt(0) + s.slice(1).toLowerCase() : 'All Subscriptions'}
@@ -106,9 +106,9 @@ export const Subscriptions: React.FC = () => {
       </div>
 
       {/* Subscriptions Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-600">
+          <table className="w-full text-left text-xs text-slate-600 dark:text-slate-400">
             <thead className="bg-slate-50 text-[11px] font-bold text-slate-700 uppercase tracking-wider border-b border-slate-200">
               <tr>
                 <th className="px-6 py-4">Subscription Number</th>
@@ -131,20 +131,20 @@ export const Subscriptions: React.FC = () => {
                   <tr key={sub.id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="px-6 py-4 font-mono font-bold text-blue-700">{sub.subscriptionNumber}</td>
                     <td className="px-6 py-4">
-                      <div className="font-bold text-slate-900">{sub.customer?.companyName || sub.customer?.user?.name}</div>
+                      <div className="font-bold text-slate-900 dark:text-slate-50">{sub.customer?.companyName || sub.customer?.user?.name}</div>
                       <div className="text-[11px] text-slate-400">{sub.customer?.user?.email}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-semibold text-slate-900">{sub.plan.name}</div>
+                      <div className="font-semibold text-slate-900 dark:text-slate-50">{sub.plan.name}</div>
                       <div className="text-[11px] text-blue-600 font-medium">{sub.plan.billingFrequency}</div>
                     </td>
                     <td className="px-6 py-4 font-mono text-slate-800">
                       {new Date(sub.nextBillingDate).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 font-mono text-slate-500">
+                    <td className="px-6 py-4 font-mono text-slate-500 dark:text-slate-400">
                       {new Date(sub.expiryDate).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 font-bold text-slate-900">
+                    <td className="px-6 py-4 font-bold text-slate-900 dark:text-slate-50">
                       ₹{sub.totalAmount.toLocaleString('en-IN')}
                     </td>
                     <td className="px-6 py-4">

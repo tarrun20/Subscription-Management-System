@@ -5,7 +5,20 @@ import { SubscriptionStatus, InvoiceStatus, BillingFrequency } from '@prisma/cli
 export async function getDashboardAnalytics(req: Request, res: Response): Promise<void> {
   try {
     const now = new Date();
-    const in30Days = new Date(Date.now() + 30 * 86400000);
+    const { startDate, endDate, renewalStatus } = req.query;
+
+    const start = startDate ? new Date(String(startDate)) : undefined;
+    const end = endDate ? new Date(String(endDate)) : undefined;
+
+    // Date range filter for invoices/payments
+    const dateFilter: any = {};
+    if (start && !isNaN(start.getTime())) {
+      dateFilter.gte = start;
+    }
+    if (end && !isNaN(end.getTime())) {
+      dateFilter.lte = end;
+    }
+    const hasDateRange = Object.keys(dateFilter).length > 0;
 
     // 1. High-level metric counts
     const totalCustomers = await prisma.customerProfile.count();
@@ -48,32 +61,59 @@ export async function getDashboardAnalytics(req: Request, res: Response): Promis
     }
     const arr = mrr * 12;
 
-    // 3. Financial revenue metrics from Invoices & Payments
+    // 3. Financial revenue metrics from Invoices & Payments (with optional date range)
+    const paymentFilter: any = {};
+    if (hasDateRange) {
+      paymentFilter.paymentDate = dateFilter;
+    }
     const totalRevenueResult = await prisma.payment.aggregate({
+      where: paymentFilter,
       _sum: { amount: true }
     });
     const totalRevenueCollected = totalRevenueResult._sum.amount || 0;
 
+    const invoiceFilter: any = {
+      status: { in: [InvoiceStatus.CONFIRMED, InvoiceStatus.DRAFT] }
+    };
+    if (hasDateRange) {
+      invoiceFilter.invoiceDate = dateFilter;
+    }
     const outstandingResult = await prisma.invoice.aggregate({
-      where: {
-        status: { in: [InvoiceStatus.CONFIRMED, InvoiceStatus.DRAFT] }
-      },
+      where: invoiceFilter,
       _sum: { outstandingBalance: true }
     });
     const outstandingPayments = outstandingResult._sum.outstandingBalance || 0;
 
+    const overdueFilter: any = {
+      status: { not: InvoiceStatus.PAID },
+      dueDate: { lt: now }
+    };
+    if (hasDateRange) {
+      overdueFilter.dueDate = dateFilter;
+    }
     const overdueInvoicesCount = await prisma.invoice.count({
-      where: {
-        status: { not: InvoiceStatus.PAID },
-        dueDate: { lt: now }
-      }
+      where: overdueFilter
     });
 
+    // Renewal status filtering
+    let renewalDaysFilter = 30;
+    if (renewalStatus === 'DUE_7') renewalDaysFilter = 7;
+    else if (renewalStatus === 'DUE_15') renewalDaysFilter = 15;
+    else if (renewalStatus === 'DUE_30') renewalDaysFilter = 30;
+
+    const renewalEnd = new Date(Date.now() + renewalDaysFilter * 86400000);
+    const renewalWhere: any = {
+      status: SubscriptionStatus.ACTIVE,
+      expiryDate: { lte: renewalEnd, gte: now }
+    };
+
+    if (renewalStatus === 'EXPIRED') {
+      renewalWhere.status = { in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.CLOSED] };
+      renewalWhere.expiryDate = { lt: now };
+    }
+
     const upcomingRenewalsCount = await prisma.subscription.count({
-      where: {
-        status: SubscriptionStatus.ACTIVE,
-        expiryDate: { lte: in30Days, gte: now }
-      }
+      where: renewalWhere
     });
 
     // 4. Interactive Charts Data
@@ -97,7 +137,9 @@ export async function getDashboardAnalytics(req: Request, res: Response): Promis
         if (sub.status === SubscriptionStatus.ACTIVE) activeCount++;
         sub.invoices.forEach(inv => {
           inv.payments.forEach(pay => {
-            revenue += pay.amount;
+            if (!hasDateRange || (pay.paymentDate >= (start || new Date(0)) && pay.paymentDate <= (end || new Date()))) {
+              revenue += pay.amount;
+            }
           });
         });
       });
@@ -108,19 +150,27 @@ export async function getDashboardAnalytics(req: Request, res: Response): Promis
       };
     });
 
-    // B) Payment Status Breakdown (Paid vs Outstanding vs Overdue)
+    // B) Payment Status Breakdown
     const paidInvoicesCount = await prisma.invoice.count({
-      where: { status: InvoiceStatus.PAID }
+      where: {
+        status: InvoiceStatus.PAID,
+        ...(hasDateRange ? { invoiceDate: dateFilter } : {})
+      }
     });
     const confirmedInvoicesCount = await prisma.invoice.count({
-      where: { status: InvoiceStatus.CONFIRMED }
+      where: {
+        status: InvoiceStatus.CONFIRMED,
+        ...(hasDateRange ? { invoiceDate: dateFilter } : {})
+      }
     });
     const draftInvoicesCount = await prisma.invoice.count({
-      where: { status: InvoiceStatus.DRAFT }
+      where: {
+        status: InvoiceStatus.DRAFT,
+        ...(hasDateRange ? { invoiceDate: dateFilter } : {})
+      }
     });
 
     // C) Monthly Revenue trend (Last 6 months)
-    const months = ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'];
     const monthlyRevenueTrend = [
       { month: 'May', revenue: 18500, payments: 4 },
       { month: 'Jun', revenue: 26400, payments: 6 },
@@ -136,6 +186,11 @@ export async function getDashboardAnalytics(req: Request, res: Response): Promis
     });
 
     res.json({
+      filtersApplied: {
+        startDate: startDate || null,
+        endDate: endDate || null,
+        renewalStatus: renewalStatus || 'ALL'
+      },
       metrics: {
         totalCustomers,
         totalSubscriptions,

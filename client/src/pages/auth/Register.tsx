@@ -70,9 +70,9 @@ export const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
           <span>Back to Login</span>
         </button>
 
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xl p-8">
+        <div className="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-xl p-8">
           <div className="mb-6">
-            <h2 className="text-2xl font-black text-slate-900">Create Customer Account</h2>
+            <h2 className="text-2xl font-black text-slate-900 dark:text-slate-50">Create Customer Account</h2>
             <p className="text-xs text-slate-500 mt-1">Get instant access to Brightloop subscriptions and self-service invoicing</p>
           </div>
 
@@ -95,7 +95,7 @@ export const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="John Doe"
-                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -109,7 +109,7 @@ export const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="john@example.com"
-                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -125,7 +125,7 @@ export const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
                     placeholder="Acme Labs Inc."
-                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -138,7 +138,7 @@ export const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+91 9876543210"
-                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -152,7 +152,7 @@ export const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
                   value={taxNumber}
                   onChange={(e) => setTaxNumber(e.target.value)}
                   placeholder="29ABCDE1234F1Z5"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
               <div>
@@ -162,7 +162,7 @@ export const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="Bengaluru, Karnataka"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -174,7 +174,7 @@ export const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
                 value={billingAddress}
                 onChange={(e) => setBillingAddress(e.target.value)}
                 placeholder="42 Business Blvd, Tech Zone"
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
 
@@ -189,13 +189,13 @@ export const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Create secure password"
-                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
 
               {/* Requirement Checklist */}
               <div className="mt-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
-                <p className="text-[11px] font-bold text-slate-600">Password Requirements:</p>
+                <p className="text-[11px] font-bold text-slate-600 dark:text-slate-400">Password Requirements:</p>
                 <div className="grid grid-cols-2 gap-1 text-[11px]">
                   <div className={`flex items-center space-x-1.5 ${hasMinLength ? 'text-emerald-600' : 'text-slate-400'}`}>
                     {hasMinLength ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
@@ -294,7 +294,7 @@ export const ForgotPassword: React.FC<RegisterProps> = ({ onNavigate }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@company.com"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <button
@@ -323,7 +323,7 @@ export const ForgotPassword: React.FC<RegisterProps> = ({ onNavigate }) => {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="NewSecurePass@2026#"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <p className="text-[10px] text-slate-400 mt-1">Must be &gt;8 chars, uppercase, lowercase, special char.</p>
             </div>
@@ -337,7 +337,7 @@ export const ForgotPassword: React.FC<RegisterProps> = ({ onNavigate }) => {
         ) : (
           <div className="text-center py-4">
             <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-2" />
-            <h3 className="text-base font-bold text-slate-900">Password Updated!</h3>
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-50">Password Updated!</h3>
             <p className="text-xs text-slate-500 mt-1 mb-4">You can now log in with your new credentials.</p>
             <button
               onClick={() => onNavigate('login')}

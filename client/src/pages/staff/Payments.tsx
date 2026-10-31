@@ -25,13 +25,13 @@ export const Payments: React.FC = () => {
   return (
     <div className="p-8 space-y-8">
       <div>
-        <h1 className="text-2xl font-black text-slate-900 tracking-tight">Payment Ledger & Receipts</h1>
+        <h1 className="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tight">Payment Ledger & Receipts</h1>
         <p className="text-xs text-slate-500 mt-1">Audit log of all full and partial collections matched against customer invoices</p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-600">
+          <table className="w-full text-left text-xs text-slate-600 dark:text-slate-400">
             <thead className="bg-slate-50 text-[11px] font-bold text-slate-700 uppercase tracking-wider border-b border-slate-200">
               <tr>
                 <th className="px-6 py-4">Receipt Number</th>
@@ -53,7 +53,7 @@ export const Payments: React.FC = () => {
                   <tr key={p.id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="px-6 py-4 font-mono font-bold text-blue-700">{p.paymentNumber}</td>
                     <td className="px-6 py-4 font-mono font-semibold text-slate-800">{p.invoice?.invoiceNumber || '-'}</td>
-                    <td className="px-6 py-4 font-bold text-slate-900">
+                    <td className="px-6 py-4 font-bold text-slate-900 dark:text-slate-50">
                       {p.customer?.companyName || p.customer?.user?.name}
                     </td>
                     <td className="px-6 py-4">
@@ -61,7 +61,7 @@ export const Payments: React.FC = () => {
                         {p.paymentMethod.replace('_', ' ')}
                       </span>
                     </td>
-                    <td className="px-6 py-4 font-mono text-slate-500">{p.transactionRef || 'N/A'}</td>
+                    <td className="px-6 py-4 font-mono text-slate-500 dark:text-slate-400">{p.transactionRef || 'N/A'}</td>
                     <td className="px-6 py-4">{new Date(p.paymentDate).toLocaleDateString()}</td>
                     <td className="px-6 py-4 text-right font-black text-emerald-600 text-sm">
                       +₹{p.amount.toLocaleString('en-IN')}

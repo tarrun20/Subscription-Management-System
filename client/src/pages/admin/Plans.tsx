@@ -138,7 +138,7 @@ export const Plans: React.FC = () => {
     <div className="p-8 space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Subscription Plans</h1>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tight">Subscription Plans</h1>
           <p className="text-xs text-slate-500 mt-1">Configure recurring billing cycles, terms, and lifecycle rules</p>
         </div>
         <button
@@ -154,7 +154,7 @@ export const Plans: React.FC = () => {
         {loading ? (
           <div className="col-span-3 text-center py-12 text-slate-400">Loading plans...</div>
         ) : plans.map((plan) => (
-          <div key={plan.id} className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div key={plan.id} className="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <span className="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-bold text-xs uppercase tracking-wider">
@@ -163,19 +163,19 @@ export const Plans: React.FC = () => {
                 <Badge status={plan.status} />
               </div>
 
-              <h3 className="text-xl font-bold text-slate-900">{plan.name}</h3>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-slate-50">{plan.name}</h3>
               <p className="text-xs text-slate-500 mt-1 line-clamp-2">{plan.description || 'No description provided'}</p>
 
               <div className="mt-4 flex items-baseline space-x-1">
-                <span className="text-3xl font-black text-slate-900">₹{plan.price.toLocaleString('en-IN')}</span>
+                <span className="text-3xl font-black text-slate-900 dark:text-slate-50">₹{plan.price.toLocaleString('en-IN')}</span>
                 <span className="text-xs text-slate-400">/{plan.billingFrequency.toLowerCase()}</span>
               </div>
 
               {/* Lifecycle Features Pill List */}
-              <div className="mt-5 space-y-2 border-t border-slate-100 pt-4 text-xs text-slate-600">
+              <div className="mt-5 space-y-2 border-t border-slate-100 pt-4 text-xs text-slate-600 dark:text-slate-400">
                 <div className="flex items-center justify-between">
                   <span>Minimum Seats:</span>
-                  <span className="font-semibold text-slate-900">{plan.minimumQuantity}</span>
+                  <span className="font-semibold text-slate-900 dark:text-slate-50">{plan.minimumQuantity}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span>Auto-close on Expiry:</span>
@@ -207,7 +207,7 @@ export const Plans: React.FC = () => {
             <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-end space-x-2">
               <button
                 onClick={() => openEditModal(plan)}
-                className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50"
               >
                 Edit Plan
               </button>
@@ -245,7 +245,7 @@ export const Plans: React.FC = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Monthly Business Pro"
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
 
@@ -258,7 +258,7 @@ export const Plans: React.FC = () => {
                 min="0"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
             <div>
@@ -266,7 +266,7 @@ export const Plans: React.FC = () => {
               <select
                 value={billingFrequency}
                 onChange={(e: any) => setBillingFrequency(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               >
                 <option value="DAILY">Daily</option>
                 <option value="WEEKLY">Weekly</option>
@@ -281,7 +281,7 @@ export const Plans: React.FC = () => {
                 min="1"
                 value={minimumQuantity}
                 onChange={(e) => setMinimumQuantity(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
           </div>
@@ -293,7 +293,7 @@ export const Plans: React.FC = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Features, SLA guarantees, or user quotas included in this plan..."
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
 
@@ -329,7 +329,7 @@ export const Plans: React.FC = () => {
                   onChange={(e) => setAutoCloseOnExpiry(e.target.checked)}
                   className="rounded text-blue-600"
                 />
-                <span className="font-medium text-slate-700">Auto-close on Expiry</span>
+                <span className="font-medium text-slate-700 dark:text-slate-300">Auto-close on Expiry</span>
               </label>
 
               <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg bg-slate-50 border border-slate-200">
@@ -339,7 +339,7 @@ export const Plans: React.FC = () => {
                   onChange={(e) => setAllowEarlyClosure(e.target.checked)}
                   className="rounded text-blue-600"
                 />
-                <span className="font-medium text-slate-700">Allow Early Closure</span>
+                <span className="font-medium text-slate-700 dark:text-slate-300">Allow Early Closure</span>
               </label>
 
               <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg bg-slate-50 border border-slate-200">
@@ -349,7 +349,7 @@ export const Plans: React.FC = () => {
                   onChange={(e) => setAllowPause(e.target.checked)}
                   className="rounded text-blue-600"
                 />
-                <span className="font-medium text-slate-700">Allow Pause / Resume</span>
+                <span className="font-medium text-slate-700 dark:text-slate-300">Allow Pause / Resume</span>
               </label>
 
               <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg bg-slate-50 border border-slate-200">
@@ -359,7 +359,7 @@ export const Plans: React.FC = () => {
                   onChange={(e) => setAllowRenewal(e.target.checked)}
                   className="rounded text-blue-600"
                 />
-                <span className="font-medium text-slate-700">Allow Renewals</span>
+                <span className="font-medium text-slate-700 dark:text-slate-300">Allow Renewals</span>
               </label>
             </div>
           </div>

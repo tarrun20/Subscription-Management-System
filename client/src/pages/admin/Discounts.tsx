@@ -97,7 +97,7 @@ export const Discounts: React.FC = () => {
     <div className="p-8 space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Discount Rules & Promotions</h1>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tight">Discount Rules & Promotions</h1>
           <p className="text-xs text-slate-500 mt-1">Configure volume discounts, coupons, and automatic invoice price reductions</p>
         </div>
         <button
@@ -109,9 +109,9 @@ export const Discounts: React.FC = () => {
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-600">
+          <table className="w-full text-left text-xs text-slate-600 dark:text-slate-400">
             <thead className="bg-slate-50 text-[11px] font-bold text-slate-700 uppercase tracking-wider border-b border-slate-200">
               <tr>
                 <th className="px-6 py-4">Rule Name</th>
@@ -131,7 +131,7 @@ export const Discounts: React.FC = () => {
               ) : (
                 discounts.map((d) => (
                   <tr key={d.id} className="hover:bg-slate-50/70 transition-colors">
-                    <td className="px-6 py-4 font-bold text-slate-900">{d.name}</td>
+                    <td className="px-6 py-4 font-bold text-slate-900 dark:text-slate-50">{d.name}</td>
                     <td className="px-6 py-4">
                       <span className="font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
                         {d.code}
@@ -140,7 +140,7 @@ export const Discounts: React.FC = () => {
                     <td className="px-6 py-4 font-bold text-emerald-600">
                       {d.type === 'PERCENTAGE' ? `${d.value}% Off` : `₹${d.value.toLocaleString('en-IN')} Off`}
                     </td>
-                    <td className="px-6 py-4 text-slate-500">
+                    <td className="px-6 py-4 text-slate-500 dark:text-slate-400">
                       ₹{d.minPurchaseAmount.toLocaleString('en-IN')} / {d.minQuantity} qty
                     </td>
                     <td className="px-6 py-4">
@@ -187,7 +187,7 @@ export const Discounts: React.FC = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Enterprise Volume Discount"
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
 
@@ -200,7 +200,7 @@ export const Discounts: React.FC = () => {
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 placeholder="VOLUME20"
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm uppercase font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm uppercase font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
             <div>
@@ -208,7 +208,7 @@ export const Discounts: React.FC = () => {
               <select
                 value={type}
                 onChange={(e: any) => setType(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               >
                 <option value="PERCENTAGE">Percentage (%)</option>
                 <option value="FIXED">Fixed Amount (₹)</option>
@@ -222,7 +222,7 @@ export const Discounts: React.FC = () => {
                 min="0"
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
           </div>
@@ -235,7 +235,7 @@ export const Discounts: React.FC = () => {
                 min="0"
                 value={minPurchaseAmount}
                 onChange={(e) => setMinPurchaseAmount(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
             <div>
@@ -245,7 +245,7 @@ export const Discounts: React.FC = () => {
                 min="1"
                 value={minQuantity}
                 onChange={(e) => setMinQuantity(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
             <div>
@@ -256,13 +256,13 @@ export const Discounts: React.FC = () => {
                 value={maxUsageLimit}
                 onChange={(e) => setMaxUsageLimit(e.target.value)}
                 placeholder="Unlimited"
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
           </div>
 
           <div className="flex justify-end space-x-3 pt-4 border-t border-slate-100">
-            <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-xs font-semibold text-slate-600">
+            <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400">
               Cancel
             </button>
             <button type="submit" className="px-5 py-2 text-xs font-bold text-white bg-blue-600 rounded-xl shadow-md">

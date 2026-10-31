@@ -151,7 +151,7 @@ export const Products: React.FC = () => {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Product Catalog & Variants</h1>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tight">Product Catalog & Variants</h1>
           <p className="text-xs text-slate-500 mt-1">Manage software products, services, and dynamic variant pricing rules</p>
         </div>
         <button
@@ -247,9 +247,9 @@ export const Products: React.FC = () => {
       </div>
 
       {/* Products Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-600">
+          <table className="w-full text-left text-xs text-slate-600 dark:text-slate-400">
             <thead className="bg-slate-50 text-[11px] font-bold text-slate-700 uppercase tracking-wider border-b border-slate-200">
               <tr>
                 <th className="px-6 py-4">Product Name</th>
@@ -278,7 +278,7 @@ export const Products: React.FC = () => {
                 products.map((p) => (
                   <tr key={p.id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="px-6 py-4">
-                      <div className="font-bold text-slate-900">{p.name}</div>
+                      <div className="font-bold text-slate-900 dark:text-slate-50">{p.name}</div>
                       {p.description && <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-1">{p.description}</p>}
                     </td>
                     <td className="px-6 py-4">
@@ -286,8 +286,8 @@ export const Products: React.FC = () => {
                         {p.type}
                       </span>
                     </td>
-                    <td className="px-6 py-4 font-bold text-slate-900">₹{p.salesPrice.toLocaleString('en-IN')}</td>
-                    <td className="px-6 py-4 text-slate-500">₹{p.costPrice.toLocaleString('en-IN')}</td>
+                    <td className="px-6 py-4 font-bold text-slate-900 dark:text-slate-50">₹{p.salesPrice.toLocaleString('en-IN')}</td>
+                    <td className="px-6 py-4 text-slate-500 dark:text-slate-400">₹{p.costPrice.toLocaleString('en-IN')}</td>
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-1.5">
                         {p.variants.map((v) => (
@@ -356,7 +356,7 @@ export const Products: React.FC = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Business Software"
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
 
@@ -366,7 +366,7 @@ export const Products: React.FC = () => {
               <select
                 value={type}
                 onChange={(e: any) => setType(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               >
                 <option value="SOFTWARE">Software</option>
                 <option value="SERVICE">Service</option>
@@ -382,7 +382,7 @@ export const Products: React.FC = () => {
                 min="0"
                 value={salesPrice}
                 onChange={(e) => setSalesPrice(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
             <div>
@@ -393,7 +393,7 @@ export const Products: React.FC = () => {
                 min="0"
                 value={costPrice}
                 onChange={(e) => setCostPrice(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
           </div>
@@ -405,7 +405,7 @@ export const Products: React.FC = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Product capabilities, terms, or specifications..."
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
 

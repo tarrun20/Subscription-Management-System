@@ -95,7 +95,7 @@ export const Invoices: React.FC = () => {
     <div className="p-8 space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Invoices & Billing Hub</h1>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tight">Invoices & Billing Hub</h1>
           <p className="text-xs text-slate-500 mt-1">
             Automated recurring invoices, payment collection, and PDF generation
           </p>
@@ -114,7 +114,7 @@ export const Invoices: React.FC = () => {
                 className={`px-3 py-1.5 rounded-lg transition-all ${
                   filterStatus === s && !filterOverdue
                     ? 'bg-white text-slate-900 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
+                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-50'
                 }`}
               >
                 {s ? s.charAt(0) + s.slice(1).toLowerCase() : 'All Invoices'}
@@ -140,9 +140,9 @@ export const Invoices: React.FC = () => {
       </div>
 
       {/* Invoices Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-600">
+          <table className="w-full text-left text-xs text-slate-600 dark:text-slate-400">
             <thead className="bg-slate-50 text-[11px] font-bold text-slate-700 uppercase tracking-wider border-b border-slate-200">
               <tr>
                 <th className="px-6 py-4">Invoice Number</th>
@@ -167,7 +167,7 @@ export const Invoices: React.FC = () => {
                     <tr key={inv.id} className="hover:bg-slate-50/70 transition-colors">
                       <td className="px-6 py-4 font-mono font-bold text-blue-700">{inv.invoiceNumber}</td>
                       <td className="px-6 py-4">
-                        <div className="font-bold text-slate-900">{inv.customer?.companyName || inv.customer?.user?.name}</div>
+                        <div className="font-bold text-slate-900 dark:text-slate-50">{inv.customer?.companyName || inv.customer?.user?.name}</div>
                         {inv.subscription && (
                           <div className="text-[11px] text-slate-400">{inv.subscription.plan.name}</div>
                         )}
@@ -178,14 +178,14 @@ export const Invoices: React.FC = () => {
                           {new Date(inv.dueDate).toLocaleDateString()}
                         </span>
                       </td>
-                      <td className="px-6 py-4 font-bold text-slate-900">
+                      <td className="px-6 py-4 font-bold text-slate-900 dark:text-slate-50">
                         ₹{inv.totalAmount.toLocaleString('en-IN')}
                       </td>
                       <td className="px-6 py-4">
                         <div>
                           <span className="font-bold text-emerald-600">₹{inv.paidAmount.toLocaleString('en-IN')}</span>
                           <span className="text-slate-400"> / </span>
-                          <span className={`font-bold ${inv.outstandingBalance > 0 ? 'text-rose-600' : 'text-slate-500'}`}>
+                          <span className={`font-bold ${inv.outstandingBalance > 0 ? 'text-rose-600' : 'text-slate-500 dark:text-slate-400'}`}>
                             ₹{inv.outstandingBalance.toLocaleString('en-IN')}
                           </span>
                         </div>
@@ -244,15 +244,15 @@ export const Invoices: React.FC = () => {
 
             <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1.5">
               <div className="flex justify-between">
-                <span className="text-slate-500">Invoice Total:</span>
-                <span className="font-bold text-slate-900">₹{selectedInvoice.totalAmount.toLocaleString('en-IN')}</span>
+                <span className="text-slate-500 dark:text-slate-400">Invoice Total:</span>
+                <span className="font-bold text-slate-900 dark:text-slate-50">₹{selectedInvoice.totalAmount.toLocaleString('en-IN')}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Already Paid:</span>
+                <span className="text-slate-500 dark:text-slate-400">Already Paid:</span>
                 <span className="font-bold text-emerald-600">₹{selectedInvoice.paidAmount.toLocaleString('en-IN')}</span>
               </div>
               <div className="flex justify-between border-t border-slate-200 pt-1.5 font-bold">
-                <span className="text-slate-700">Remaining Balance Due:</span>
+                <span className="text-slate-700 dark:text-slate-300">Remaining Balance Due:</span>
                 <span className="text-rose-600">₹{selectedInvoice.outstandingBalance.toLocaleString('en-IN')}</span>
               </div>
             </div>
@@ -266,7 +266,7 @@ export const Invoices: React.FC = () => {
                 max={selectedInvoice.outstandingBalance}
                 value={paymentAmount}
                 onChange={(e) => setPaymentAmount(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
               <p className="text-[10px] text-slate-400 mt-1">Supports both full and partial payments.</p>
             </div>
@@ -276,7 +276,7 @@ export const Invoices: React.FC = () => {
               <select
                 value={paymentMethod}
                 onChange={(e: any) => setPaymentMethod(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               >
                 <option value="BANK_TRANSFER">Bank Transfer (NEFT/RTGS)</option>
                 <option value="UPI">UPI (GPay / PhonePe / Paytm)</option>
@@ -293,7 +293,7 @@ export const Invoices: React.FC = () => {
                 value={transactionRef}
                 onChange={(e) => setTransactionRef(e.target.value)}
                 placeholder="e.g. UTR-9238491823"
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
 
@@ -304,12 +304,12 @@ export const Invoices: React.FC = () => {
                 value={paymentNotes}
                 onChange={(e) => setPaymentNotes(e.target.value)}
                 placeholder="Optional billing note..."
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
             </div>
 
             <div className="flex justify-end space-x-3 pt-3 border-t border-slate-100">
-              <button type="button" onClick={() => setIsPaymentModalOpen(false)} className="px-4 py-2 text-xs font-semibold text-slate-600">
+              <button type="button" onClick={() => setIsPaymentModalOpen(false)} className="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400">
                 Cancel
               </button>
               <button
