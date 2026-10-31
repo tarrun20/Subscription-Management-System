@@ -117,8 +117,10 @@ export async function createSubscription(req: Request, res: Response): Promise<v
     }
 
     const start = startDate ? new Date(startDate) : new Date();
-    const nextBilling = calculateNextDate(start, plan.billingFrequency);
-    const expiry = new Date(start);
+    const trialEnds = plan.trialDays > 0 ? new Date(start.getTime() + plan.trialDays * 86400000) : null;
+    const billingAnchor = trialEnds || start;
+    const nextBilling = trialEnds || calculateNextDate(start, plan.billingFrequency);
+    const expiry = new Date(billingAnchor);
     expiry.setFullYear(expiry.getFullYear() + 1);
 
     const subscriptionNumber = await generateSequence('SUB');
@@ -175,6 +177,7 @@ export async function createSubscription(req: Request, res: Response): Promise<v
         startDate: start,
         expiryDate: expiry,
         nextBillingDate: nextBilling,
+        trialEndsAt: trialEnds,
         paymentTerms: paymentTerms as PaymentTerms,
         subtotal,
         taxAmount,

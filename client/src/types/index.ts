@@ -58,6 +58,7 @@ export interface SubscriptionPlan {
   price: number;
   billingFrequency: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY';
   minimumQuantity: number;
+  trialDays?: number;
   availableFrom?: string;
   availableUntil?: string;
   autoCloseOnExpiry: boolean;
@@ -112,6 +113,7 @@ export interface Subscription {
   startDate: string;
   expiryDate: string;
   nextBillingDate: string;
+  trialEndsAt?: string | null;
   paymentTerms: 'IMMEDIATE' | 'NET_15' | 'NET_30' | 'NET_60';
   subtotal: number;
   taxAmount: number;

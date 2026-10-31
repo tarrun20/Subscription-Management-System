@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { Subscription } from '../../types';
 import { Badge } from '../../components/Badge';
-import { Repeat, Pause, Play, RefreshCw, XOctagon, Calendar, AlertCircle } from 'lucide-react';
+import { Repeat, Pause, Play, RefreshCw, XOctagon, Calendar, AlertCircle, Plus } from 'lucide-react';
 
 export const Subscriptions: React.FC = () => {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
@@ -75,6 +75,16 @@ export const Subscriptions: React.FC = () => {
     } finally {
       setActionLoading(null);
     }
+  };
+
+  const handleRecordUsage = async (id: string) => {
+    const description = window.prompt('Usage description (for example, API calls):');
+    if (!description?.trim()) return;
+    const quantity = Number(window.prompt('Quantity:', '1'));
+    const unitPrice = Number(window.prompt('Price per unit (₹):', '0'));
+    const taxRate = Number(window.prompt('Tax rate (%):', '18'));
+    try { await api.post(`/subscriptions/${id}/usage`, { description, quantity, unitPrice, taxRate }); alert('Usage added to the next invoice.'); }
+    catch (err: any) { alert(err.response?.data?.message || 'Could not record usage.'); }
   };
 
   return (
@@ -152,6 +162,7 @@ export const Subscriptions: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end space-x-1.5">
+                        {sub.status === 'ACTIVE' && <button onClick={() => handleRecordUsage(sub.id)} className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg" title="Record billable usage"><Plus className="w-3.5 h-3.5" /></button>}
                         {sub.status === 'ACTIVE' && sub.plan.allowPause && (
                           <button
                             onClick={() => handlePause(sub.id)}

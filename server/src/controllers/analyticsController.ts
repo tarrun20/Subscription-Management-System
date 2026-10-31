@@ -224,3 +224,22 @@ export async function getDashboardAnalytics(req: Request, res: Response): Promis
     res.status(500).json({ message: 'Error calculating analytics', error: error.message });
   }
 }
+
+export async function getRetentionAnalytics(req: Request, res: Response): Promise<void> {
+  const [total, active, closed, changes, plans] = await Promise.all([
+    prisma.subscription.count(),
+    prisma.subscription.count({ where: { status: SubscriptionStatus.ACTIVE } }),
+    prisma.subscription.count({ where: { status: SubscriptionStatus.CLOSED } }),
+    prisma.subscriptionChange.findMany({ orderBy: { createdAt: 'desc' }, take: 500 }),
+    prisma.subscription.groupBy({ by: ['planId'], _count: { _all: true }, where: { status: SubscriptionStatus.ACTIVE } })
+  ]);
+  const planIds = plans.map(p => p.planId);
+  const planRows = planIds.length ? await prisma.subscriptionPlan.findMany({ where: { id: { in: planIds } }, select: { id: true, name: true } }) : [];
+  const names = new Map(planRows.map(p => [p.id, p.name]));
+  const downgradeCount = changes.filter(c => c.newAmount < c.oldAmount).length;
+  res.json({
+    subscriptions: { total, active, closed, churnRatePercent: total ? Math.round(closed / total * 10000) / 100 : 0 },
+    planChanges: { total: changes.length, upgrades: changes.filter(c => c.newAmount > c.oldAmount).length, downgrades: downgradeCount },
+    activeByPlan: plans.map(p => ({ planId: p.planId, planName: names.get(p.planId) || 'Plan', count: p._count._all }))
+  });
+}

@@ -6,10 +6,17 @@ import { Badge } from '../../components/Badge';
 import { Repeat, Receipt, Download } from 'lucide-react';
 
 export const CustomerPortal: React.FC = () => {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
+  const [payingInvoice, setPayingInvoice] = useState<string | null>(null);
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [profile, setProfile] = useState({ name: '', phone: '', companyName: '', taxNumber: '', billingAddress: '', city: '', state: '', country: 'India', zipCode: '' });
+
+  useEffect(() => {
+    setProfile({ name: user?.name || '', phone: user?.phone || '', companyName: user?.customerProfile?.companyName || '', taxNumber: user?.customerProfile?.taxNumber || '', billingAddress: user?.customerProfile?.billingAddress || '', city: user?.customerProfile?.city || '', state: user?.customerProfile?.state || '', country: user?.customerProfile?.country || 'India', zipCode: user?.customerProfile?.zipCode || '' });
+  }, [user]);
 
   useEffect(() => {
     Promise.all([
@@ -39,6 +46,34 @@ export const CustomerPortal: React.FC = () => {
     }
   };
 
+  const handleOnlinePayment = async (invoiceId: string) => {
+    setPayingInvoice(invoiceId);
+    try {
+      const orderResponse = await api.post(`/payments/checkout/${invoiceId}`);
+      const { keyId, order, invoice } = orderResponse.data;
+      const w = window as any;
+      if (!w.Razorpay) {
+        await new Promise<void>((resolve, reject) => {
+          const script = document.createElement('script'); script.src = 'https://checkout.razorpay.com/v1/checkout.js'; script.onload = () => resolve(); script.onerror = () => reject(new Error('Could not load secure checkout.')); document.body.appendChild(script);
+        });
+      }
+      const checkout = new w.Razorpay({ key: keyId, order_id: order.id, amount: order.amount, currency: order.currency, name: 'Brightloop Software', description: `Invoice ${invoice.invoiceNumber}`, handler: async (result: any) => {
+        try {
+          await api.post('/payments/checkout/verify', { invoiceId, ...result });
+          const [nextInvoices, nextPayments] = await Promise.all([api.get('/invoices'), api.get('/payments')]); setInvoices(nextInvoices.data); setPayments(nextPayments.data); alert('Payment received.');
+        } catch (error: any) { alert(error.response?.data?.message || 'Payment is awaiting confirmation.'); }
+      } });
+      checkout.open();
+    } catch (error: any) { alert(error.response?.data?.message || 'Could not start online payment.'); }
+    finally { setPayingInvoice(null); }
+  };
+
+  const saveProfile = async (event: React.FormEvent) => {
+    event.preventDefault();
+    try { await api.put('/users/me/profile', profile); await refreshUser(); setEditingProfile(false); }
+    catch (error: any) { alert(error.response?.data?.message || 'Could not save profile.'); }
+  };
+
   return (
     <div className="p-8 space-y-8">
       <div className="bg-gradient-to-r from-blue-700 to-indigo-800 rounded-2xl p-6 text-white shadow-xl">
@@ -53,9 +88,15 @@ export const CustomerPortal: React.FC = () => {
           <div className="text-right">
             <span className="text-xs text-blue-200">Active Subscriptions</span>
             <p className="text-3xl font-black">{subscriptions.filter(s => s.status === 'ACTIVE').length}</p>
+            <button onClick={() => setEditingProfile(v => !v)} className="mt-2 text-xs font-semibold text-white underline">{editingProfile ? 'Close profile editor' : 'Edit billing profile'}</button>
           </div>
         </div>
       </div>
+
+      {editingProfile && <form onSubmit={saveProfile} className="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 p-5 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+        {Object.entries(profile).map(([key, value]) => <label key={key} className="space-y-1"><span className="block text-slate-500 capitalize">{key.replace(/([A-Z])/g, ' $1')}</span><input value={value} onChange={e => setProfile(p => ({ ...p, [key]: e.target.value }))} className="w-full rounded-lg border border-slate-200 p-2 dark:bg-slate-700 dark:border-slate-600" /></label>)}
+        <div className="md:col-span-3 flex justify-end"><button className="px-4 py-2 rounded-lg bg-blue-600 text-white font-bold">Save billing profile</button></div>
+      </form>}
 
       <div>
         <h2 className="text-base font-bold text-slate-900 mb-3 flex items-center space-x-2">
@@ -131,13 +172,10 @@ export const CustomerPortal: React.FC = () => {
                     <td className="px-6 py-3.5 font-bold text-rose-600">₹{inv.outstandingBalance.toLocaleString('en-IN')}</td>
                     <td className="px-6 py-3.5"><Badge status={inv.status} /></td>
                     <td className="px-6 py-3.5 text-right">
-                      <button
-                        onClick={() => handleDownloadPdf(inv.id, inv.invoiceNumber)}
-                        className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-xs"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>Download PDF</span>
-                      </button>
+                      <div className="inline-flex gap-2">
+                        {inv.outstandingBalance > 0 && <button disabled={payingInvoice === inv.id} onClick={() => handleOnlinePayment(inv.id)} className="px-3 py-1 rounded-lg bg-blue-600 text-white font-semibold text-xs disabled:opacity-50">{payingInvoice === inv.id ? 'Opening…' : 'Pay online'}</button>}
+                        <button onClick={() => handleDownloadPdf(inv.id, inv.invoiceNumber)} className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-xs"><Download className="w-3.5 h-3.5" /><span>PDF</span></button>
+                      </div>
                     </td>
                   </tr>
                 ))

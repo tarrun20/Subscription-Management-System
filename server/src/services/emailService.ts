@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 
 export interface EmailOptions {
   to: string;
@@ -49,20 +47,6 @@ export class EmailService {
         throw new Error(`Invalid email recipient: ${options.to}`);
       }
 
-      const smtpHost = process.env.SMTP_HOST;
-      const smtpPort = process.env.SMTP_PORT;
-      const smtpUser = process.env.SMTP_USER;
-      const smtpPass = process.env.SMTP_PASS;
-
-      if (smtpHost && smtpUser && smtpPass) {
-        // If live SMTP configured, can connect via nodemailer or socket
-        // For security and hackathon reproducibility, fallback gracefully if SMTP fails
-        console.log(`[EmailService] Delivering live email to ${options.to} via SMTP ${smtpHost}:${smtpPort || 587}...`);
-      } else {
-        // Mock / Local logging transport
-        console.log(`[EmailService] [DISPATCHED] To: ${options.to} | Subject: "${options.subject}" | MessageID: ${messageId}`);
-      }
-
       const result: EmailDeliveryResult = {
         success: true,
         messageId,
@@ -71,6 +55,15 @@ export class EmailService {
         sentAt: now
       };
 
+      const apiKey = process.env.RESEND_API_KEY;
+      if (apiKey) {
+        const response = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: process.env.EMAIL_FROM || 'Brightloop Billing <billing@brightloop.com>', to: [options.to], subject: options.subject, html: options.html, text: options.text }) });
+        const payload: any = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.message || `Email provider returned ${response.status}`);
+        result.messageId = payload.id || messageId;
+      } else {
+        console.log(`[EmailService] [MOCK] To: ${options.to} | Subject: "${options.subject}" | MessageID: ${messageId}`);
+      }
       sentEmailsLog.push({ ...options, ...result });
       return result;
     } catch (err: any) {
@@ -189,6 +182,15 @@ export class EmailService {
       html,
       actionUrl: params.actionUrl
     });
+  }
+
+  public async sendPaymentReminder(params: { to: string; customerName: string; invoiceNumber: string; dueDate: Date; balance: number; daysOverdue: number }): Promise<EmailDeliveryResult> {
+    const due = params.dueDate.toLocaleDateString('en-IN');
+    const amount = `₹${params.balance.toLocaleString('en-IN')}`;
+    const subject = `Payment reminder: invoice ${params.invoiceNumber}`;
+    const text = `Hello ${params.customerName}, invoice ${params.invoiceNumber} for ${amount} was due on ${due} and is now ${params.daysOverdue} days overdue. Please arrange payment or contact billing@brightloop.com.`;
+    const html = `<p>Hello ${params.customerName},</p><p>Invoice <strong>${params.invoiceNumber}</strong> for <strong>${amount}</strong> was due on ${due} and is now ${params.daysOverdue} days overdue.</p><p>Please arrange payment or contact billing@brightloop.com.</p>`;
+    return this.sendEmail({ to: params.to, subject, text, html, metadata: { invoiceNumber: params.invoiceNumber, daysOverdue: params.daysOverdue } });
   }
 
   public getSentEmails(): Array<EmailOptions & EmailDeliveryResult> {

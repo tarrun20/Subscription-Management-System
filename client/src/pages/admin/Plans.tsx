@@ -18,6 +18,7 @@ export const Plans: React.FC = () => {
   const [price, setPrice] = useState('5000');
   const [billingFrequency, setBillingFrequency] = useState<'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY'>('MONTHLY');
   const [minimumQuantity, setMinimumQuantity] = useState('1');
+  const [trialDays, setTrialDays] = useState('0');
   const [availableFrom, setAvailableFrom] = useState('');
   const [availableUntil, setAvailableUntil] = useState('');
   const [autoCloseOnExpiry, setAutoCloseOnExpiry] = useState(false);
@@ -54,6 +55,7 @@ export const Plans: React.FC = () => {
     setPrice('5000');
     setBillingFrequency('MONTHLY');
     setMinimumQuantity('1');
+    setTrialDays('0');
     setAvailableFrom('');
     setAvailableUntil('');
     setAutoCloseOnExpiry(false);
@@ -72,6 +74,7 @@ export const Plans: React.FC = () => {
     setPrice(String(p.price));
     setBillingFrequency(p.billingFrequency);
     setMinimumQuantity(String(p.minimumQuantity));
+    setTrialDays(String(p.trialDays || 0));
     setAvailableFrom(p.availableFrom ? p.availableFrom.split('T')[0] : '');
     setAvailableUntil(p.availableUntil ? p.availableUntil.split('T')[0] : '');
     setAutoCloseOnExpiry(p.autoCloseOnExpiry);
@@ -94,6 +97,7 @@ export const Plans: React.FC = () => {
         price: Number(price),
         billingFrequency,
         minimumQuantity: Number(minimumQuantity),
+        trialDays: Number(trialDays),
         availableFrom: availableFrom || null,
         availableUntil: availableUntil || null,
         autoCloseOnExpiry,
@@ -177,6 +181,7 @@ export const Plans: React.FC = () => {
                   <span>Minimum Seats:</span>
                   <span className="font-semibold text-slate-900 dark:text-slate-50">{plan.minimumQuantity}</span>
                 </div>
+                {(plan.trialDays || 0) > 0 && <div className="flex items-center justify-between"><span>Free trial:</span><span className="font-semibold text-emerald-600">{plan.trialDays} days</span></div>}
                 <div className="flex items-center justify-between">
                   <span>Auto-close on Expiry:</span>
                   <span className={`font-semibold ${plan.autoCloseOnExpiry ? 'text-amber-600' : 'text-slate-400'}`}>
@@ -283,6 +288,10 @@ export const Plans: React.FC = () => {
                 onChange={(e) => setMinimumQuantity(e.target.value)}
                 className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Free Trial (days)</label>
+              <input type="number" min="0" max="365" value={trialDays} onChange={e => setTrialDays(e.target.value)} className="w-full border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" />
             </div>
           </div>
 

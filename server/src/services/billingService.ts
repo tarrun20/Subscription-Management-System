@@ -51,7 +51,8 @@ export async function runAutomatedBilling(): Promise<{
       },
       customer: {
         include: { user: true }
-      }
+      },
+      usageRecords: { where: { status: 'PENDING' }, orderBy: { createdAt: 'asc' } }
     }
   });
 
@@ -120,6 +121,15 @@ export async function runAutomatedBilling(): Promise<{
         discount: line.discount,
         lineTotal: lineSubtotal
       });
+    }
+
+    const usageBaseProductId = sub.lines[0]?.productId;
+    if (usageBaseProductId) for (const usage of sub.usageRecords) {
+      const lineSubtotal = Math.round(usage.quantity * usage.unitPrice * 100) / 100;
+      const lineTax = Math.round(lineSubtotal * usage.taxRate) / 100;
+      subtotal += lineSubtotal;
+      taxAmount += lineTax;
+      invoiceLinesData.push({ productId: usageBaseProductId, variantId: null, description: `Usage: ${usage.description}`, quantity: usage.quantity, unitPrice: usage.unitPrice, taxRate: usage.taxRate, discount: 0, lineTotal: lineSubtotal });
     }
 
     let discountAmount = 0;
@@ -214,6 +224,8 @@ export async function runAutomatedBilling(): Promise<{
       if (creditApplied > 0) {
         await tx.customerProfile.update({ where: { id: sub.customerId }, data: { creditBalance: { decrement: creditApplied } } });
       }
+
+      if (sub.usageRecords.length) await tx.usageRecord.updateMany({ where: { id: { in: sub.usageRecords.map(u => u.id) }, status: 'PENDING' }, data: { invoiceId: invoice.id, status: 'BILLED' } });
 
       await tx.subscription.update({
         where: { id: sub.id },

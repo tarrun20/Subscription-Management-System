@@ -12,6 +12,7 @@ import {
 import { changePlan } from '../controllers/advancedController';
 import { authenticateToken, requireRole } from '../middlewares/auth';
 import { Role } from '@prisma/client';
+import { listUsage, recordUsage } from '../controllers/usageController';
 
 const router = Router();
 
@@ -19,6 +20,8 @@ router.use(authenticateToken);
 
 router.get('/', getSubscriptions);
 router.get('/analytics', requireRole([Role.ADMIN, Role.STAFF]), getSubscriptionAnalytics);
+router.get('/:id/usage', requireRole([Role.ADMIN, Role.MANAGER, Role.STAFF]), listUsage);
+router.post('/:id/usage', requireRole([Role.ADMIN, Role.MANAGER, Role.STAFF]), recordUsage);
 router.get('/:id', getSubscriptionById);
 router.post('/', requireRole([Role.ADMIN, Role.STAFF]), createSubscription);
 

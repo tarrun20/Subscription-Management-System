@@ -215,6 +215,22 @@ Renewal reminders run daily at 08:00 server time. The unique subscription/date/s
 
 The database extension is in `server/prisma/migrations/20261031000000_advanced_subscription_tools`. Apply it to a database that already has the original Brightloop schema, then regenerate Prisma Client with `cd server && npm run prisma:generate`. This repository did not have a prior migration history, so a fresh database still needs the original schema initialized using the existing project setup before applying this incremental migration.
 
+### Additional billing and reporting features
+
+The latest extension adds plan trial periods, staff-recorded metered usage, customer billing-profile editing, Razorpay hosted invoice checkout, overdue-payment reminders, ledger CSV export, retention metrics, and admin/manager audit-log access. Metered usage is attached to the next recurring invoice. Existing discount codes remain available through discount rules.
+
+Apply the new migration after the advanced subscription tools migration, then regenerate Prisma Client:
+
+```bash
+cd server
+npx prisma migrate deploy
+npm run prisma:generate
+```
+
+Configure optional outbound email through `RESEND_API_KEY` and `EMAIL_FROM`. Without a Resend key, email delivery is logged in mock mode and is not sent externally. Configure hosted payments with `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, and `RAZORPAY_WEBHOOK_SECRET`; set the Razorpay webhook URL to `/api/payments/webhook` and subscribe to `payment.captured`. Keep these secrets server-side. Online payment is disabled until all required values are set. Failed/overdue invoices receive idempotent reminders at 1, 7, and 14 days overdue; automatic card retries require a separately configured recurring-payment mandate and are not initiated by this checkout flow.
+
+Staff can record usage from the Subscriptions screen or through `POST /api/subscriptions/:id/usage` with `description`, `quantity`, `unitPrice`, and optional `taxRate`. Customers can edit their billing profile in the Customer Portal. `GET /api/exports/ledger.csv` exports the current user's ledger (customer-scoped for customers); `GET /api/exports/audit-logs` is limited to admins and managers. Retention metrics are available at `GET /api/analytics/retention`.
+
 ## 7. GitHub Desktop Collaboration Guide
 
 This repository is configured to update live in GitHub Desktop:

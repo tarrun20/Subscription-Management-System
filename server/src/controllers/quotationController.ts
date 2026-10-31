@@ -255,9 +255,9 @@ export async function convertToSubscription(req: Request, res: Response): Promis
     }
 
     const start = startDate ? new Date(startDate) : new Date();
-    const nextBilling = calculateNextDate(start, quotation.plan.billingFrequency);
-    
-    const expiry = new Date(start);
+    const trialEnds = quotation.plan.trialDays > 0 ? new Date(start.getTime() + quotation.plan.trialDays * 86400000) : null;
+    const nextBilling = trialEnds || calculateNextDate(start, quotation.plan.billingFrequency);
+    const expiry = new Date(trialEnds || start);
     expiry.setFullYear(expiry.getFullYear() + 1);
 
     const subscriptionNumber = await generateSequence('SUB');
@@ -273,6 +273,7 @@ export async function convertToSubscription(req: Request, res: Response): Promis
           startDate: start,
           expiryDate: expiry,
           nextBillingDate: nextBilling,
+          trialEndsAt: trialEnds,
           paymentTerms: paymentTerms as PaymentTerms,
           subtotal: quotation.subtotal,
           taxAmount: quotation.taxAmount,

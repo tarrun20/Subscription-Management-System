@@ -188,6 +188,7 @@ model SubscriptionPlan {
   price              Float
   billingFrequency   BillingFrequency   @default(MONTHLY)
   minimumQuantity    Int                @default(1)
+  trialDays          Int                @default(0)
   availableFrom      DateTime?
   availableUntil     DateTime?
   autoCloseOnExpiry  Boolean            @default(false)
@@ -319,6 +320,7 @@ model Subscription {
   startDate          DateTime           @default(now())
   expiryDate         DateTime
   nextBillingDate    DateTime
+  trialEndsAt        DateTime?
   paymentTerms       PaymentTerms       @default(IMMEDIATE)
   subtotal           Float              @default(0.0)
   taxAmount          Float              @default(0.0)
@@ -331,6 +333,7 @@ model Subscription {
   renewalHistory     RenewalHistory[]
   renewalNotifications RenewalNotification[]
   subscriptionChanges SubscriptionChange[]
+  usageRecords       UsageRecord[]
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
 
@@ -382,6 +385,7 @@ model Invoice {
   notes              String?
   lines              InvoiceLine[]
   payments           Payment[]
+  usageRecords       UsageRecord[]
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
 
@@ -423,6 +427,7 @@ model Payment {
   paymentMethod PaymentMethod @default(BANK_TRANSFER)
   paymentDate   DateTime      @default(now())
   transactionRef String?
+  providerPaymentId String?    @unique
   notes         String?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
@@ -430,6 +435,23 @@ model Payment {
   @@index([paymentNumber])
   @@index([invoiceId])
   @@index([customerId])
+}
+
+model UsageRecord {
+  id             String       @id @default(uuid())
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  invoiceId       String?
+  invoice         Invoice?     @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  description    String
+  quantity       Float
+  unitPrice      Float
+  taxRate        Float         @default(0)
+  status         String        @default("PENDING")
+  recordedBy     String?
+  createdAt      DateTime      @default(now())
+  @@index([subscriptionId, status])
+  @@index([invoiceId])
 }
 
 model AuditLog {

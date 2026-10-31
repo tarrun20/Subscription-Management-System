@@ -26,6 +26,20 @@ export async function getCustomers(req: Request, res: Response): Promise<void> {
   }
 }
 
+export async function updateMyProfile(req: Request, res: Response): Promise<void> {
+  const userId = req.user!.id;
+  const { name, phone, companyName, taxNumber, billingAddress, city, state, country, zipCode } = req.body;
+  if (name !== undefined && !String(name).trim()) { res.status(400).json({ message: 'Name cannot be blank.' }); return; }
+  const profile = await prisma.customerProfile.findUnique({ where: { userId }, select: { id: true } });
+  if (!profile) { res.status(404).json({ message: 'Customer profile not found.' }); return; }
+  const updated = await prisma.$transaction(async tx => {
+    await tx.user.update({ where: { id: userId }, data: { name: name === undefined ? undefined : String(name).trim(), phone: phone === undefined ? undefined : String(phone).trim() || null } });
+    await tx.customerProfile.update({ where: { id: profile.id }, data: { companyName, taxNumber, billingAddress, city, state, country, zipCode } });
+    return tx.user.findUnique({ where: { id: userId }, include: { customerProfile: true } });
+  });
+  res.json({ message: 'Profile updated.', user: updated });
+}
+
 export async function getStaffMembers(req: Request, res: Response): Promise<void> {
   try {
     const staff = await prisma.staffProfile.findMany({

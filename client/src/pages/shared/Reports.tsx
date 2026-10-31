@@ -4,10 +4,17 @@ import { AnalyticsData } from '../../types';
 
 export const Reports: React.FC = () => {
   const [data, setData] = useState<AnalyticsData | null>(null);
+  const [retention, setRetention] = useState<any>(null);
 
   useEffect(() => {
-    api.get('/analytics/dashboard').then(res => setData(res.data)).catch(console.error);
+    Promise.all([api.get('/analytics/dashboard'), api.get('/analytics/retention')]).then(([d, r]) => { setData(d.data); setRetention(r.data); }).catch(console.error);
   }, []);
+
+  const downloadLedger = async () => {
+    const response = await api.get('/exports/ledger.csv', { responseType: 'blob' });
+    const url = URL.createObjectURL(new Blob([response.data], { type: 'text/csv' }));
+    const link = document.createElement('a'); link.href = url; link.download = 'brightloop-ledger.csv'; link.click(); URL.revokeObjectURL(url);
+  };
 
   if (!data) return <div className="p-8 text-center text-slate-400">Loading financial reports...</div>;
 
@@ -51,6 +58,18 @@ export const Reports: React.FC = () => {
             </tr>
           </tbody>
         </table>
+      </div>
+      <div className="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/60 p-6 shadow-sm space-y-4">
+        <div className="flex items-center justify-between"><div><h3 className="text-base font-bold text-slate-900 dark:text-slate-50">Retention & Plan Movement</h3><p className="text-xs text-slate-500 mt-1">Subscription status and recorded plan changes</p></div><button onClick={downloadLedger} className="px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-bold">Download ledger CSV</button></div>
+        {retention && <>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+            <div className="p-4 rounded-xl bg-slate-50"><span className="text-slate-500">Active</span><strong className="block text-xl">{retention.subscriptions.active}</strong></div>
+            <div className="p-4 rounded-xl bg-slate-50"><span className="text-slate-500">Closed</span><strong className="block text-xl">{retention.subscriptions.closed}</strong></div>
+            <div className="p-4 rounded-xl bg-slate-50"><span className="text-slate-500">Closed share</span><strong className="block text-xl">{retention.subscriptions.churnRatePercent}%</strong></div>
+            <div className="p-4 rounded-xl bg-slate-50"><span className="text-slate-500">Upgrades / downgrades</span><strong className="block text-xl">{retention.planChanges.upgrades} / {retention.planChanges.downgrades}</strong></div>
+          </div>
+          <div className="space-y-2">{retention.activeByPlan.map((p: any) => <div key={p.planId} className="flex justify-between text-sm border-b border-slate-100 pb-2"><span>{p.planName}</span><strong>{p.count} active</strong></div>)}</div>
+        </>}
       </div>
     </div>
   );

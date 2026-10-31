@@ -19,6 +19,9 @@ import billingRoutes from './routes/billingRoutes';
 import { runAutomatedBilling } from './services/billingService';
 import advancedRoutes from './routes/advancedRoutes';
 import { runRenewalReminders } from './controllers/advancedController';
+import exportRoutes from './routes/exportRoutes';
+import { runDunningReminders } from './services/dunningService';
+import { razorpayWebhook } from './controllers/gatewayController';
 
 dotenv.config();
 
@@ -34,6 +37,7 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+app.post('/api/payments/webhook', express.raw({ type: 'application/json' }), (req, res, next) => { void razorpayWebhook(req, res).catch(next); });
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -60,6 +64,7 @@ app.use('/api/taxes', taxRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/advanced', advancedRoutes);
+app.use('/api/exports', exportRoutes);
 
 // Error Handling Middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
@@ -84,6 +89,11 @@ cron.schedule('0 * * * *', async () => {
 cron.schedule('0 8 * * *', async () => {
   try { const result = await runRenewalReminders(); console.log('[Cron] Renewal reminder generation:', result); }
   catch (error) { console.error('[Cron] Renewal reminder job failed:', error); }
+});
+
+cron.schedule('0 9 * * *', async () => {
+  try { const result = await runDunningReminders(); console.log('[Cron] Payment reminder run:', result); }
+  catch (error) { console.error('[Cron] Payment reminder job failed:', error); }
 });
 
 // Start Server
