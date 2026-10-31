@@ -4,12 +4,28 @@ type Theme = 'light' | 'dark';
 
 interface ThemeContextType {
   theme: Theme;
-  toggleTheme: () => void;
-  setThemeMode: (mode: Theme) => void;
   isDark: boolean;
+  setLight: () => void;
+  setDark: () => void;
+  toggleTheme: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+// Apply theme directly to DOM - called immediately, no React delays
+function applyThemeToDom(mode: Theme) {
+  const html = document.documentElement;
+  if (mode === 'dark') {
+    html.classList.add('dark');
+    html.style.colorScheme = 'dark';
+  } else {
+    html.classList.remove('dark');
+    html.style.colorScheme = 'light';
+  }
+  try {
+    localStorage.setItem('brightloop_theme', mode);
+  } catch {}
+}
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>(() => {
@@ -20,37 +36,29 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return 'light';
   });
 
-  const applyTheme = (mode: Theme) => {
-    const root = document.documentElement;
-    if (mode === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-    try {
-      localStorage.setItem('brightloop_theme', mode);
-    } catch {}
-  };
-
+  // Apply on initial mount and whenever theme changes
   useEffect(() => {
-    applyTheme(theme);
+    applyThemeToDom(theme);
   }, [theme]);
 
-  const toggleTheme = () => {
-    setTheme(prev => {
-      const next: Theme = prev === 'dark' ? 'light' : 'dark';
-      applyTheme(next);
-      return next;
-    });
+  const setLight = () => {
+    applyThemeToDom('light');
+    setTheme('light');
   };
 
-  const setThemeMode = (mode: Theme) => {
-    applyTheme(mode);
-    setTheme(mode);
+  const setDark = () => {
+    applyThemeToDom('dark');
+    setTheme('dark');
+  };
+
+  const toggleTheme = () => {
+    const next: Theme = theme === 'dark' ? 'light' : 'dark';
+    applyThemeToDom(next);
+    setTheme(next);
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, setThemeMode, isDark: theme === 'dark' }}>
+    <ThemeContext.Provider value={{ theme, isDark: theme === 'dark', setLight, setDark, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );
