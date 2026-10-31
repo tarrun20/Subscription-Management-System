@@ -32,12 +32,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab }) =
     { id: 'plans', label: 'Subscription Plans', icon: Layers },
     { id: 'quotations', label: 'Quotations', icon: FileText },
     { id: 'subscriptions', label: 'Subscriptions', icon: Repeat },
+    { id: 'renewal-management', label: 'Renewal Management', icon: Repeat },
     { id: 'invoices', label: 'Invoices & Billing', icon: Receipt },
     { id: 'payments', label: 'Payments', icon: CreditCard },
     { id: 'discounts', label: 'Discounts', icon: Percent },
     { id: 'taxes', label: 'Tax Rules', icon: ShieldCheck },
     { id: 'staff', label: 'Staff Members', icon: UserCheck },
     { id: 'reports', label: 'Financial Reports', icon: BarChart3 },
+    { id: 'revenue-simulator', label: 'Revenue Simulator', icon: BarChart3 },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
@@ -46,6 +48,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab }) =
     { id: 'customers', label: 'Customers', icon: Users },
     { id: 'quotations', label: 'Quotations', icon: FileText },
     { id: 'subscriptions', label: 'Subscriptions', icon: Repeat },
+    { id: 'renewal-management', label: 'Renewal Management', icon: Repeat },
     { id: 'invoices', label: 'Invoices', icon: Receipt },
     { id: 'payments', label: 'Record Payments', icon: CreditCard },
     { id: 'reports', label: 'Operational Reports', icon: BarChart3 },
@@ -54,12 +57,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab }) =
 
   const customerMenu = [
     { id: 'portal', label: 'My Subscriptions', icon: Repeat },
+    { id: 'renewals-simulator', label: 'Renewals & Cost Simulator', icon: BarChart3 },
     { id: 'customer-invoices', label: 'My Invoices', icon: Receipt },
     { id: 'customer-payments', label: 'Payment History', icon: CreditCard },
     { id: 'customer-profile', label: 'Account Profile', icon: Users },
   ];
 
-  const items = role === 'ADMIN' ? adminMenu : role === 'STAFF' ? staffMenu : customerMenu;
+  const managerMenu = [
+    { id: 'revenue-simulator', label: 'Revenue Simulator', icon: BarChart3 },
+  ];
+
+  const items = role === 'ADMIN' ? adminMenu : role === 'MANAGER' ? managerMenu : role === 'STAFF' ? staffMenu : customerMenu;
 
   return (
     <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 min-h-screen border-r border-slate-800">

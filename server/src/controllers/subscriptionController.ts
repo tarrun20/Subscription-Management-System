@@ -288,7 +288,7 @@ export async function renewSubscription(req: Request, res: Response): Promise<vo
     const id = String(req.params.id);
     const sub = await prisma.subscription.findUnique({
       where: { id },
-      include: { plan: true }
+      include: { plan: true, lines: { include: { product: true, variant: true } } }
     });
 
     if (!sub) {
@@ -296,23 +296,51 @@ export async function renewSubscription(req: Request, res: Response): Promise<vo
       return;
     }
 
+    if (req.user?.role === Role.CUSTOMER && sub.customerId !== req.user.customerProfileId) {
+      res.status(403).json({ message: 'Forbidden' }); return;
+    }
+
     if (!sub.plan.allowRenewal) {
       res.status(400).json({ message: 'This plan does not permit renewals.' });
       return;
     }
 
-    const newExpiry = calculateNextDate(new Date(sub.expiryDate), sub.plan.billingFrequency);
-
-    const updated = await prisma.subscription.update({
-      where: { id },
-      data: {
-        expiryDate: newExpiry,
-        status: SubscriptionStatus.ACTIVE
-      }
+    if (sub.status === SubscriptionStatus.CLOSED || sub.status === SubscriptionStatus.DRAFT || sub.status === SubscriptionStatus.QUOTATION) {
+      res.status(400).json({ message: 'This subscription is not eligible for renewal.' }); return;
+    }
+    if (sub.status === SubscriptionStatus.PAUSED) { res.status(400).json({ message: 'Resume the subscription before renewing.' }); return; }
+    const key = String(req.headers['idempotency-key'] || req.body?.idempotencyKey || '').trim();
+    if (!key) { res.status(400).json({ message: 'An idempotency key is required.' }); return; }
+    const prior = await prisma.renewalHistory.findUnique({ where: { idempotencyKey: key } });
+    if (prior && prior.subscriptionId !== id) { res.status(409).json({ message: 'That idempotency key was already used for a different subscription.' }); return; }
+    if (prior) { const updated = await prisma.subscription.findUnique({ where: { id } }); res.json({ message: 'Subscription renewal already processed', subscription: updated, renewal: prior }); return; }
+    const previousExpiry = new Date(sub.expiryDate);
+    const newExpiry = calculateNextDate(previousExpiry, sub.plan.billingFrequency);
+    const alreadyRenewed = await prisma.renewalHistory.findFirst({ where: { subscriptionId: id, previousExpiryDate: previousExpiry } });
+    if (alreadyRenewed) { res.status(409).json({ message: 'This renewal period has already been confirmed.', renewal: alreadyRenewed }); return; }
+    const invoiceNumber = await generateSequence('INV');
+    const now = new Date();
+    const dueDate = new Date(now); dueDate.setDate(dueDate.getDate() + 7);
+    const updated = await prisma.$transaction(async tx => {
+      const customer = await tx.customerProfile.findUnique({ where: { id: sub.customerId }, select: { creditBalance: true } });
+      const creditApplied = Math.round(Math.min(customer?.creditBalance || 0, sub.totalAmount) * 100) / 100;
+      const outstanding = Math.max(0, Math.round((sub.totalAmount - creditApplied) * 100) / 100);
+      const invoice = await tx.invoice.create({ data: { invoiceNumber, subscriptionId: id, customerId: sub.customerId, status: outstanding === 0 && creditApplied > 0 ? 'PAID' : 'CONFIRMED', invoiceDate: now, dueDate, subtotal: sub.subtotal, taxAmount: sub.taxAmount, discountAmount: sub.discountAmount, totalAmount: sub.totalAmount, creditApplied, paidAmount: creditApplied, outstandingBalance: outstanding, billingPeriodStart: previousExpiry, billingPeriodEnd: newExpiry, notes: `Confirmed renewal for ${sub.plan.name}`, lines: { create: sub.lines.map(line => ({ productId: line.productId, variantId: line.variantId, description: line.variant ? `${line.product.name} (${line.variant.variantName})` : line.product.name, quantity: line.quantity, unitPrice: line.unitPrice, taxRate: line.taxRate, discount: line.discount, lineTotal: line.lineTotal })) } } });
+      if (creditApplied > 0) await tx.customerProfile.update({ where: { id: sub.customerId }, data: { creditBalance: { decrement: creditApplied } } });
+      const result = await tx.subscription.update({ where: { id }, data: { expiryDate: newExpiry, nextBillingDate: newExpiry, status: SubscriptionStatus.ACTIVE } });
+      const renewal = await tx.renewalHistory.create({ data: { subscriptionId: id, customerId: sub.customerId, previousExpiryDate: previousExpiry, newExpiryDate: newExpiry, renewalAmount: sub.totalAmount, planName: sub.plan.name, idempotencyKey: key } });
+      await tx.auditLog.create({ data: { userId: req.user?.id, action: 'SUBSCRIPTION_RENEWED', entityType: 'Subscription', entityId: id, details: { idempotencyKey: key, invoiceNumber: invoice.invoiceNumber, previousExpiry: previousExpiry.toISOString(), newExpiry: newExpiry.toISOString() } } });
+      return { ...result, renewal, invoice };
     });
 
-    res.json({ message: 'Subscription renewed successfully', subscription: updated });
+    res.json({ message: 'Subscription renewed successfully', subscription: updated, renewal: updated.renewal, invoiceNumber: updated.invoice.invoiceNumber });
   } catch (error: any) {
+    if (error?.code === 'P2002') {
+      const key = String(req.headers['idempotency-key'] || req.body?.idempotencyKey || '').trim();
+      const prior = key ? await prisma.renewalHistory.findUnique({ where: { idempotencyKey: key } }) : null;
+      if (prior && prior.subscriptionId === String(req.params.id)) { res.json({ message: 'Subscription renewal already processed', renewal: prior }); return; }
+      res.status(409).json({ message: 'This renewal period has already been confirmed.' }); return;
+    }
     res.status(500).json({ message: 'Error renewing subscription', error: error.message });
   }
 }

@@ -9,6 +9,7 @@ datasource db {
 
 enum Role {
   ADMIN
+  MANAGER
   STAFF
   CUSTOMER
 }
@@ -99,6 +100,7 @@ model User {
   customerProfile      CustomerProfile?
   staffProfile         StaffProfile?
   auditLogs            AuditLog[]
+  revenueScenarios     RevenueScenario[]
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
 
@@ -117,9 +119,13 @@ model CustomerProfile {
   state          String?
   country        String?        @default("India")
   zipCode        String?
+  creditBalance  Float          @default(0)
   quotations     Quotation[]
   subscriptions  Subscription[]
   invoices       Invoice[]
+  renewalHistory RenewalHistory[]
+  renewalNotifications RenewalNotification[]
+  subscriptionChanges SubscriptionChange[]
   payments       Payment[]
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
@@ -322,6 +328,9 @@ model Subscription {
   pausedAt           DateTime?
   lines              SubscriptionLine[]
   invoices           Invoice[]
+  renewalHistory     RenewalHistory[]
+  renewalNotifications RenewalNotification[]
+  subscriptionChanges SubscriptionChange[]
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
 
@@ -365,6 +374,7 @@ model Invoice {
   taxAmount          Float           @default(0.0)
   discountAmount     Float           @default(0.0)
   totalAmount        Float           @default(0.0)
+  creditApplied      Float           @default(0.0)
   paidAmount         Float           @default(0.0)
   outstandingBalance Float           @default(0.0)
   billingPeriodStart DateTime?
@@ -434,4 +444,76 @@ model AuditLog {
 
   @@index([userId])
   @@index([entityType, entityId])
+}
+
+model RenewalHistory {
+  id                 String   @id @default(uuid())
+  subscriptionId     String
+  subscription       Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  customerId         String
+  customer           CustomerProfile @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  previousExpiryDate DateTime
+  newExpiryDate      DateTime
+  renewalAmount      Float
+  planName           String
+  renewedAt          DateTime @default(now())
+  idempotencyKey     String   @unique
+  @@unique([subscriptionId, previousExpiryDate])
+  @@index([subscriptionId, renewedAt])
+}
+
+model RenewalNotification {
+  id             String   @id @default(uuid())
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  customerId     String
+  customer       CustomerProfile @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  stageDays      Int
+  renewalDate    DateTime
+  renewalAmount  Float
+  createdAt      DateTime @default(now())
+  @@unique([subscriptionId, renewalDate, stageDays])
+  @@index([customerId, createdAt])
+}
+
+model SubscriptionChange {
+  id              String   @id @default(uuid())
+  subscriptionId  String
+  subscription    Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  customerId      String
+  customer        CustomerProfile @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  oldPlanId       String
+  newPlanId       String
+  oldPlanName     String
+  newPlanName     String
+  oldAmount       Float
+  newAmount       Float
+  prorationAmount Float
+  taxAmount       Float
+  discountAmount  Float   @default(0)
+  calculation     Json
+  effectiveAt     DateTime
+  status          String   @default("CONFIRMED")
+  idempotencyKey  String   @unique
+  createdAt       DateTime @default(now())
+  @@index([subscriptionId, createdAt])
+}
+
+model RenewalSettings {
+  id                String   @id @default("default")
+  reminderIntervals Json     @default("[30,15,7,3,0]")
+  updatedAt         DateTime @updatedAt
+}
+
+model RevenueScenario {
+  id          String   @id @default(uuid())
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  assumptions Json
+  result      Json
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@index([ownerId, updatedAt])
 }

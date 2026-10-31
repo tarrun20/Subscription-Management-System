@@ -32,9 +32,9 @@ export async function register(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    // Role assignment: Only ADMIN can register STAFF or ADMIN. Defaults to CUSTOMER.
+    // Role assignment: Only ADMIN can register restricted business roles. Defaults to CUSTOMER.
     let userRole: Role = Role.CUSTOMER;
-    if (role === Role.STAFF || role === Role.ADMIN) {
+    if (role === Role.STAFF || role === Role.ADMIN || role === Role.MANAGER) {
       if (!req.user || req.user.role !== Role.ADMIN) {
         res.status(403).json({ message: 'Only administrators can create staff or admin accounts.' });
         return;
@@ -64,7 +64,7 @@ export async function register(req: Request, res: Response): Promise<void> {
             }
           }
         }),
-        ...(userRole === Role.STAFF && {
+        ...((userRole === Role.STAFF || userRole === Role.MANAGER) && {
           staffProfile: {
             create: {
               employeeCode: `BL-STF-${Date.now().toString().slice(-4)}`,

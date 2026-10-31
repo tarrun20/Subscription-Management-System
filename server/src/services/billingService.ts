@@ -12,11 +12,15 @@ export function calculateNextDate(startDate: Date, frequency: BillingFrequency):
       d.setDate(d.getDate() + 7);
       break;
     case BillingFrequency.MONTHLY:
-      d.setMonth(d.getMonth() + 1);
+    case BillingFrequency.YEARLY: {
+      const day = d.getDate();
+      const wasMonthEnd = day === new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+      d.setDate(1);
+      d.setMonth(d.getMonth() + (frequency === BillingFrequency.MONTHLY ? 1 : 12));
+      const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+      d.setDate(wasMonthEnd ? lastDay : Math.min(day, lastDay));
       break;
-    case BillingFrequency.YEARLY:
-      d.setFullYear(d.getFullYear() + 1);
-      break;
+    }
   }
   return d;
 }
@@ -180,20 +184,24 @@ export async function runAutomatedBilling(): Promise<{
     }
 
     await prisma.$transaction(async (tx) => {
+      const customerCredit = await tx.customerProfile.findUnique({ where: { id: sub.customerId }, select: { creditBalance: true } });
+      const creditApplied = Math.round(Math.min(customerCredit?.creditBalance || 0, totalAmount) * 100) / 100;
+      const payableAmount = Math.max(0, Math.round((totalAmount - creditApplied) * 100) / 100);
       const invoice = await tx.invoice.create({
         data: {
           invoiceNumber,
           subscriptionId: sub.id,
           customerId: sub.customerId,
-          status: InvoiceStatus.CONFIRMED,
+          status: payableAmount === 0 && creditApplied > 0 ? InvoiceStatus.PAID : InvoiceStatus.CONFIRMED,
           invoiceDate: periodStart,
           dueDate,
           subtotal,
           taxAmount,
           discountAmount,
           totalAmount,
-          paidAmount: 0.0,
-          outstandingBalance: totalAmount,
+          creditApplied,
+          paidAmount: creditApplied,
+          outstandingBalance: payableAmount,
           billingPeriodStart: periodStart,
           billingPeriodEnd: periodEnd,
           notes: `Automated recurring invoice for cycle ${periodStart.toISOString().split('T')[0]} to ${periodEnd.toISOString().split('T')[0]}`,
@@ -202,6 +210,10 @@ export async function runAutomatedBilling(): Promise<{
           }
         }
       });
+
+      if (creditApplied > 0) {
+        await tx.customerProfile.update({ where: { id: sub.customerId }, data: { creditBalance: { decrement: creditApplied } } });
+      }
 
       await tx.subscription.update({
         where: { id: sub.id },

@@ -17,6 +17,8 @@ import taxRoutes from './routes/taxRoutes';
 import analyticsRoutes from './routes/analyticsRoutes';
 import billingRoutes from './routes/billingRoutes';
 import { runAutomatedBilling } from './services/billingService';
+import advancedRoutes from './routes/advancedRoutes';
+import { runRenewalReminders } from './controllers/advancedController';
 
 dotenv.config();
 
@@ -57,6 +59,7 @@ app.use('/api/discounts', discountRoutes);
 app.use('/api/taxes', taxRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/billing', billingRoutes);
+app.use('/api/advanced', advancedRoutes);
 
 // Error Handling Middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
@@ -76,6 +79,11 @@ cron.schedule('0 * * * *', async () => {
   } catch (error) {
     console.error('[Cron] Error running automated billing job:', error);
   }
+});
+
+cron.schedule('0 8 * * *', async () => {
+  try { const result = await runRenewalReminders(); console.log('[Cron] Renewal reminder generation:', result); }
+  catch (error) { console.error('[Cron] Renewal reminder job failed:', error); }
 });
 
 // Start Server

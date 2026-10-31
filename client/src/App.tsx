@@ -18,6 +18,7 @@ import { Payments } from './pages/staff/Payments';
 import { CustomerPortal } from './pages/customer/CustomerPortal';
 import { Reports, Settings } from './pages/shared/Reports';
 import api from './services/api';
+import { CustomerTools, RevenueSimulator, RenewalManagement } from './pages/shared/AdvancedTools';
 
 const AppContent: React.FC = () => {
   const { user, token, isLoading } = useAuth();
@@ -43,7 +44,7 @@ const AppContent: React.FC = () => {
   }
 
   // Adjust default tab for customer role
-  const effectiveTab = user.role === 'CUSTOMER' && currentTab === 'dashboard' ? 'portal' : currentTab;
+  const effectiveTab = user.role === 'CUSTOMER' && currentTab === 'dashboard' ? 'portal' : user.role === 'MANAGER' && currentTab === 'dashboard' ? 'revenue-simulator' : currentTab;
 
   const handleTriggerBilling = async () => {
     try {
@@ -60,6 +61,7 @@ const AppContent: React.FC = () => {
 
   const renderContent = () => {
     if (user.role === 'CUSTOMER') {
+      if (effectiveTab === 'renewals-simulator') return <CustomerTools />;
       return <CustomerPortal />;
     }
 
@@ -76,6 +78,10 @@ const AppContent: React.FC = () => {
         return <Quotations />;
       case 'subscriptions':
         return <Subscriptions />;
+      case 'revenue-simulator':
+        return <RevenueSimulator />;
+      case 'renewal-management':
+        return <RenewalManagement />;
       case 'invoices':
         return <Invoices />;
       case 'payments':

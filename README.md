@@ -198,6 +198,23 @@ npm test
 
 ---
 
+### Advanced renewal and simulation endpoints
+
+The advanced extension is mounted at `/api/advanced` (all endpoints require a bearer token):
+
+| Method | Path | Access | Purpose |
+| --- | --- | --- | --- |
+| GET | `/renewals` | Customer (own records), staff/admin | Renewal timeline, in-app reminder history and renewal history |
+| POST | `/subscriptions/:id/change-plan` | Customer (own record), staff/admin | Preview a plan change; confirm with `confirm: true` and an `Idempotency-Key` header |
+| GET/PUT | `/renewal-settings` | Admin | Read or set reminder stages in whole days |
+| POST | `/customer-simulator` | Customer | Estimate catalog plan totals for selected plan IDs and quantity |
+| POST | `/revenue-simulator` | Admin | Calculate a hypothetical business scenario; pass `save: true` and `name` to persist it |
+| GET/DELETE | `/revenue-simulator/scenarios[/:id]` | Admin | List or delete scenarios owned by the current admin |
+
+Renewal reminders run daily at 08:00 server time. The unique subscription/date/stage key makes generation idempotent. Notifications are stored in-app; no email transport exists in this project. The manager simulator uses current active subscriptions as its MRR baseline and stores assumptions and outputs without creating invoices or payments.
+
+The database extension is in `server/prisma/migrations/20261031000000_advanced_subscription_tools`. Apply it to a database that already has the original Brightloop schema, then regenerate Prisma Client with `cd server && npm run prisma:generate`. This repository did not have a prior migration history, so a fresh database still needs the original schema initialized using the existing project setup before applying this incremental migration.
+
 ## 7. GitHub Desktop Collaboration Guide
 
 This repository is configured to update live in GitHub Desktop:
