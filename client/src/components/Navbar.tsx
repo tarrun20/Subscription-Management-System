@@ -37,27 +37,24 @@ export const Navbar: React.FC<NavbarProps> = ({ onTriggerBilling, billingLoading
         <div className="h-6 w-px bg-slate-200 dark:bg-slate-700" />
 
         {/* Dark / Light Mode Toggle */}
-        <div className="flex items-center space-x-2" title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
-          <Sun className={`w-3.5 h-3.5 transition-colors ${isDark ? 'text-slate-500' : 'text-amber-500'}`} />
-          <button
-            role="switch"
-            aria-checked={isDark}
-            aria-label="Toggle dark mode"
-            onClick={toggleTheme}
-            className={`relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 ${
-              isDark
-                ? 'bg-indigo-600 border-indigo-600'
-                : 'bg-slate-200 border-slate-200'
-            }`}
-          >
-            <span
-              className={`pointer-events-none inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow-md ring-0 transition-transform duration-300 ${
-                isDark ? 'translate-x-4' : 'translate-x-0'
-              }`}
-            />
-          </button>
-          <Moon className={`w-3.5 h-3.5 transition-colors ${isDark ? 'text-indigo-400' : 'text-slate-400'}`} />
-        </div>
+        <button
+          onClick={toggleTheme}
+          type="button"
+          className="flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-200 transition-colors shadow-sm"
+          title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        >
+          {isDark ? (
+            <>
+              <Sun className="w-3.5 h-3.5 text-amber-400" />
+              <span className="text-xs font-semibold">Light Mode</span>
+            </>
+          ) : (
+            <>
+              <Moon className="w-3.5 h-3.5 text-indigo-500" />
+              <span className="text-xs font-semibold">Dark Mode</span>
+            </>
+          )}
+        </button>
 
         <div className="h-6 w-px bg-slate-200 dark:bg-slate-700" />
 

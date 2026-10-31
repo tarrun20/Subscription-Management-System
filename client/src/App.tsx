@@ -63,7 +63,7 @@ const AppContent: React.FC = () => {
   const renderContent = () => {
     if (user.role === 'CUSTOMER') {
       if (effectiveTab === 'renewals-simulator') return <CustomerTools />;
-      return <CustomerPortal />;
+      return <CustomerPortal currentTab={effectiveTab} />;
     }
 
     switch (effectiveTab) {

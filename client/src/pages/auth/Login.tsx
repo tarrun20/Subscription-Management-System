@@ -31,9 +31,20 @@ export const Login: React.FC<LoginProps> = ({ onNavigate }) => {
     }
   };
 
-  const handleQuickLogin = (roleEmail: string, rolePass: string) => {
+  const handleQuickLogin = async (roleEmail: string, rolePass: string) => {
     setEmail(roleEmail);
     setPassword(rolePass);
+    setError('');
+    setLoading(true);
+
+    try {
+      const res = await api.post('/auth/login', { email: roleEmail, password: rolePass });
+      login(res.data.token, res.data.user);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Login failed. Please verify your credentials.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,10 +52,21 @@ export const Login: React.FC<LoginProps> = ({ onNavigate }) => {
       {/* Theme toggle on login page */}
       <button
         onClick={toggleTheme}
-        className="fixed top-4 right-4 p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors shadow-sm"
+        type="button"
+        className="fixed top-4 right-4 flex items-center space-x-2 py-2 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-md text-xs font-semibold"
         title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
       >
-        {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+        {isDark ? (
+          <>
+            <Sun className="w-4 h-4 text-amber-400" />
+            <span>Light Mode</span>
+          </>
+        ) : (
+          <>
+            <Moon className="w-4 h-4 text-indigo-500" />
+            <span>Dark Mode</span>
+          </>
+        )}
       </button>
 
       <div className="max-w-md w-full">
