@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { ThemeToggle } from '../../components/ThemeToggle';
 import api from '../../services/api';
 import {
   ArrowLeft,
@@ -79,24 +80,9 @@ export const Register: React.FC<RegisterProps> = ({ onNavigate }) => {
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950 flex items-center justify-center p-4 py-10 transition-colors duration-200">
       {/* Theme toggle on register page */}
-      <button
-        onClick={toggleTheme}
-        type="button"
-        className="fixed top-4 right-4 flex items-center space-x-2 py-2 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-md text-xs font-semibold"
-        title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-      >
-        {isDark ? (
-          <>
-            <Sun className="w-4 h-4 text-amber-400" />
-            <span>Light Mode</span>
-          </>
-        ) : (
-          <>
-            <Moon className="w-4 h-4 text-indigo-500" />
-            <span>Dark Mode</span>
-          </>
-        )}
-      </button>
+      <div className="fixed top-4 right-4 z-40">
+        <ThemeToggle />
+      </div>
 
       <div className="max-w-xl w-full">
         {/* Navigation link */}
@@ -340,24 +326,9 @@ export const ForgotPassword: React.FC<RegisterProps> = ({ onNavigate }) => {
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950 flex items-center justify-center p-4 transition-colors duration-200">
       {/* Theme toggle */}
-      <button
-        onClick={toggleTheme}
-        type="button"
-        className="fixed top-4 right-4 flex items-center space-x-2 py-2 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-md text-xs font-semibold"
-        title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-      >
-        {isDark ? (
-          <>
-            <Sun className="w-4 h-4 text-amber-400" />
-            <span>Light Mode</span>
-          </>
-        ) : (
-          <>
-            <Moon className="w-4 h-4 text-indigo-500" />
-            <span>Dark Mode</span>
-          </>
-        )}
-      </button>
+      <div className="fixed top-4 right-4 z-40">
+        <ThemeToggle />
+      </div>
 
       <div className="max-w-md w-full">
         {/* Navigation link */}
