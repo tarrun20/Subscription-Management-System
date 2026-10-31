@@ -1,0 +1,13 @@
+import { Router } from 'express';
+import { getPayments, recordPayment } from '../controllers/paymentController';
+import { authenticateToken, requireRole } from '../middlewares/auth';
+import { Role } from '@prisma/client';
+
+const router = Router();
+
+router.use(authenticateToken);
+
+router.get('/', getPayments);
+router.post('/', requireRole([Role.ADMIN, Role.STAFF]), recordPayment);
+
+export default router;
